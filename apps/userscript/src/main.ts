@@ -100,5 +100,16 @@ function watchChapters() {
   setInterval(() => void check(), 1500);
 }
 
+/** Diagnostic : ajoute « #mt-debug » à la fin d'une adresse pour voir ce que le script détecte. */
+async function debugReport() {
+  const capture = detectChapter({ url: location.href, title: document.title });
+  const key = parseCaptureKey(await getValue<string>(KEY, ""));
+  toast(
+    `Manga Tracker actif · clé : ${key ? "oui" : "non"} · chapitre : ${capture ? `${capture.seriesTitle} ${capture.chapter}` : "non détecté"}`,
+    { duration: 8000 },
+  );
+}
+if (location.hash.includes("mt-debug")) void debugReport();
+
 if (location.href.startsWith(APP_URL)) linkFromWebApp();
 else watchChapters();
