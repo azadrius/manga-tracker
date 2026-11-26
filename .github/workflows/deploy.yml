@@ -28,6 +28,8 @@ jobs:
       - run: npm run build
         env:
           BASE_PATH: /${{ github.event.repository.name }}/
+      # Le script Safari est servi avec l'appli : https://<compte>.github.io/<dépôt>/manga-tracker.user.js
+      - run: npm run build:userscript && cp apps/userscript/dist/manga-tracker.user.js apps/web/dist/
       - uses: actions/upload-pages-artifact@v3
         with:
           path: apps/web/dist
