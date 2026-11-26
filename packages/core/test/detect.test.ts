@@ -2,6 +2,17 @@ import { describe, expect, it } from "vitest";
 import { detectChapter, seriesKey } from "../src";
 
 describe("Asura Scans", () => {
+  it("détecte un vrai lien de chapitre", () => {
+    const c = detectChapter({ url: "https://asurascans.com/comics/chronicles-of-the-demon-faction-7de80a82/chapter/198" });
+    expect(c).toMatchObject({
+      site: "asurascans.com",
+      seriesSlug: "chronicles-of-the-demon-faction",
+      seriesTitle: "Chronicles Of The Demon Faction",
+      seriesUrl: "https://asurascans.com/comics/chronicles-of-the-demon-faction-7de80a82",
+      chapter: 198,
+    });
+  });
+
   it("détecte le format /comics/<slug>/chapter/<n>", () => {
     const c = detectChapter({ url: "https://asurascans.com/comics/solo-max-level-newbie-0f4b5c3a/chapter/180" });
     expect(c).toMatchObject({
@@ -40,6 +51,17 @@ describe("Asura Scans", () => {
 });
 
 describe("Manhuaus", () => {
+  it("détecte un vrai lien de chapitre", () => {
+    const c = detectChapter({ url: "https://manhuaus.com/manga/barbarians-adventure-in-a-fantasy-world/chapter-75/" });
+    expect(c).toMatchObject({
+      site: "manhuaus.com",
+      seriesSlug: "barbarians-adventure-in-a-fantasy-world",
+      seriesTitle: "Barbarians Adventure In A Fantasy World",
+      seriesUrl: "https://manhuaus.com/manga/barbarians-adventure-in-a-fantasy-world/",
+      chapter: 75,
+    });
+  });
+
   it("détecte /manga/<slug>/chapter-<n>/", () => {
     const c = detectChapter({ url: "https://manhuaus.com/manga/martial-peak/chapter-3800/" });
     expect(c).toMatchObject({

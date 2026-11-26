@@ -8,12 +8,14 @@ La liste est synchronisée via ton compte Google.
 
 ```
  Chrome (PC)            Safari (iPhone / iPad)
- extension              script « Userscripts »        ← étapes 2 et 3
-      │                        │
+ extension              script « Userscripts » (étape 3)
+      │   clé de capture       │
       └──────────┬─────────────┘
                  ▼
-        Firebase (Firestore)  ◄──── Appli web (PWA) : liste, recherche, corrections
-        users/{uid}/series/{site__série}
+   users/{uid}/inbox   (dépôt seulement)
+                 │
+                 ▼  rangé par l'appli web dès qu'elle est ouverte (on garde le chapitre le plus élevé)
+   users/{uid}/series  ◄──── Appli web (PWA) : liste, recherche, corrections
 ```
 
 - **Détection** (`packages/core`) : à partir de l'URL d'une page, reconnaît le site, la série et le numéro du chapitre.
@@ -30,6 +32,7 @@ La liste est synchronisée via ton compte Google.
 | --- | --- |
 | `packages/core` | Détection du manga et du chapitre, avec tests |
 | `apps/web` | Appli web (PWA) |
+| `apps/extension` | Extension Chrome |
 | `firestore.rules` | Règles de sécurité : chacun n'accède qu'à sa liste |
 | `docs/` | Guides de mise en place |
 | `.github/workflows` | Tests automatiques et déploiement sur GitHub Pages |
@@ -43,9 +46,12 @@ npm run typecheck
 npm run emulators    # base Firebase locale (Java requis)
 npm run dev:local    # appli connectée à la base locale, sans compte réel
 npm run dev          # appli connectée au vrai projet Firebase
+npm run build:extension        # extension dans apps/extension/dist
+npm run build:extension:local  # extension connectée aux émulateurs
 ```
 
 Mise en place du projet Firebase : voir [docs/firebase-setup.md](docs/firebase-setup.md).
+Installation de l'extension : voir [docs/enregistrement-automatique.md](docs/enregistrement-automatique.md).
 
 ## Ajouter un site
 

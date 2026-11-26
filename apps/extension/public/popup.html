@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Manga Tracker</title>
+    <link rel="stylesheet" href="popup.css" />
+  </head>
+  <body>
+    <header>
+      <img src="icons/icon-48.png" alt="" width="24" height="24" />
+      <h1>Manga Tracker</h1>
+    </header>
+
+    <section>
+      <h2>Dernier chapitre détecté</h2>
+      <p id="last" class="muted"></p>
+    </section>
+
+    <section>
+      <h2>Clé de capture</h2>
+      <p class="muted help">
+        Dans l'appli, ouvre « Enregistrement automatique », copie ta clé et colle-la ici. Elle sera retrouvée sur tous
+        tes Chrome connectés au même compte Google.
+      </p>
+      <form id="key-form">
+        <input id="key" type="text" placeholder="mt1.…" autocomplete="off" spellcheck="false" />
+        <button type="submit">Enregistrer</button>
+      </form>
+      <p id="key-state" class="muted"></p>
+    </section>
+
+    <a id="open-app" class="button" target="_blank" rel="noreferrer">Ouvrir ma liste</a>
+    <script src="popup.js"></script>
+  </body>
+</html>

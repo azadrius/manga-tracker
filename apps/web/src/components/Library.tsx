@@ -1,9 +1,11 @@
 import type { User } from "firebase/auth";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { signOutUser } from "../lib/auth";
+import { processInbox } from "../lib/inbox";
 import type { Series } from "../lib/library";
 import { useLibrary } from "../lib/useLibrary";
 import { AddByUrl } from "./AddByUrl";
+import { CaptureSettings } from "./CaptureSettings";
 import { SeriesCard } from "./SeriesCard";
 
 type Sort = "recent" | "title";
@@ -20,6 +22,10 @@ export function Library({ user }: { user: User }) {
   const { series, error } = useLibrary(user.uid);
   const [search, setSearch] = useState("");
   const [sort, setSort] = useState<Sort>("recent");
+  const [inboxError, setInboxError] = useState<Error | null>(null);
+
+  // Range les chapitres envoyés par l'extension / le script Safari.
+  useEffect(() => processInbox(user.uid, setInboxError), [user.uid]);
 
   const visible = useMemo(() => {
     const q = normalize(search.trim());
@@ -47,7 +53,7 @@ export function Library({ user }: { user: User }) {
         </select>
       </div>
 
-      {error && <p className="error">Erreur de synchronisation : {error.message}</p>}
+      {(error ?? inboxError) && <p className="error">Erreur de synchronisation : {(error ?? inboxError)!.message}</p>}
       {series === null && !error && <p className="muted">Chargement…</p>}
       {series?.length === 0 && (
         <p className="muted empty">
@@ -67,6 +73,8 @@ export function Library({ user }: { user: User }) {
           </ul>
         </>
       )}
+
+      <CaptureSettings uid={user.uid} />
     </main>
   );
 }
