@@ -16,6 +16,7 @@ const header = `// ==UserScript==
 // @grant        GM.getValue
 // @grant        GM.setValue
 // @run-at       document-idle
+// @inject-into  content
 // @noframes
 // @updateURL    ${scriptUrl}
 // @downloadURL  ${scriptUrl}
