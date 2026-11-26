@@ -26,11 +26,17 @@ const SENT = "sentChapters";
  * pour que Safari soit relié sans rien copier-coller.
  */
 function linkFromWebApp() {
+  let confirmed = false;
   const grab = async () => {
     const el = document.querySelector<HTMLElement>("[data-capture-key]");
     const value = el?.dataset.captureKey;
     if (!value || !parseCaptureKey(value)) return;
-    if ((await getValue<string>(KEY, "")) === value) return;
+    if ((await getValue<string>(KEY, "")) === value) {
+      if (!confirmed) toast("Safari est déjà relié à ta liste ✓");
+      confirmed = true;
+      return;
+    }
+    confirmed = true;
     await setValue(KEY, value);
     await setValue(SENT, {});
     toast("Safari est relié à ta liste ✓");
@@ -69,7 +75,10 @@ function watchChapters() {
 
     const sent = await getValue<Record<string, number>>(SENT, {});
     const id = seriesKey(capture);
-    if ((sent[id] ?? -1) >= capture.chapter) return;
+    if ((sent[id] ?? -1) >= capture.chapter) {
+      toast(`Manga Tracker : ${capture.seriesTitle} · ch. ${capture.chapter} déjà enregistré`);
+      return;
+    }
 
     const result = await sendCapture(target, key, capture);
     if (result === "saved") {
@@ -82,7 +91,8 @@ function watchChapters() {
         duration: 6000,
       });
     } else {
-      lastUrl = ""; // Pas de réseau : on réessaiera.
+      toast("Manga Tracker : envoi impossible, nouvel essai bientôt.", { error: true, duration: 4000 });
+      setTimeout(() => (lastUrl = ""), 10000); // Pas de réseau : on réessaiera.
     }
   };
 
