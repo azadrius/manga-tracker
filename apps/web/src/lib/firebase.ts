@@ -14,6 +14,8 @@ export const auth = getAuth(app);
 
 // Cache local : la liste s'affiche instantanément et reste consultable hors ligne.
 export const db = initializeFirestore(app, {
+  // Safari/iOS bloque parfois le flux temps réel : repli automatique sur le long polling.
+  experimentalAutoDetectLongPolling: true,
   localCache: useEmulators ? memoryLocalCache() : persistentLocalCache({ tabManager: persistentMultipleTabManager() }),
 });
 

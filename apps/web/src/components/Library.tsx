@@ -18,14 +18,34 @@ const sorters: Record<Sort, (a: Series, b: Series) => number> = {
 /** Ignore accents et majuscules pour la recherche. */
 const normalize = (s: string) => s.normalize("NFD").replace(/\p{Diacritic}/gu, "").toLowerCase();
 
+function useForegroundTick() {
+  const [tick, setTick] = useState(0);
+  useEffect(() => {
+    const bump = () => setTick((t) => t + 1);
+    const onVisible = () => document.visibilityState === "visible" && bump();
+    document.addEventListener("visibilitychange", onVisible);
+    window.addEventListener("pageshow", bump);
+    window.addEventListener("online", bump);
+    return () => {
+      document.removeEventListener("visibilitychange", onVisible);
+      window.removeEventListener("pageshow", bump);
+      window.removeEventListener("online", bump);
+    };
+  }, []);
+  return tick;
+}
+
 export function Library({ user }: { user: User }) {
-  const { series, error } = useLibrary(user.uid);
+  // iOS Safari coupe les connexions temps réel quand l'onglet passe en arrière-plan
+  // (par ex. pendant la lecture) : on les rouvre au retour sur la page.
+  const refreshKey = useForegroundTick();
+  const { series, error } = useLibrary(user.uid, refreshKey);
   const [search, setSearch] = useState("");
   const [sort, setSort] = useState<Sort>("recent");
   const [inboxError, setInboxError] = useState<Error | null>(null);
 
   // Range les chapitres envoyés par l'extension / le script Safari.
-  useEffect(() => processInbox(user.uid, setInboxError), [user.uid]);
+  useEffect(() => processInbox(user.uid, setInboxError), [user.uid, refreshKey]);
 
   const visible = useMemo(() => {
     const q = normalize(search.trim());
