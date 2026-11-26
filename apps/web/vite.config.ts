@@ -13,6 +13,11 @@ export default defineConfig({
     VitePWA({
       registerType: "autoUpdate",
       includeAssets: ["icon.svg", "apple-touch-icon.png"],
+      workbox: {
+        // Sans ça, le service worker répond « index.html » à l'ouverture de manga-tracker.user.js
+        // (navigation) et Safari affiche la liste au lieu de proposer d'installer le script.
+        navigateFallbackDenylist: [/\.user\.js$/],
+      },
       manifest: {
         name: "Manga Tracker",
         short_name: "Mangas",
