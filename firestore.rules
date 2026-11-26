@@ -1,0 +1,25 @@
+rules_version = '2';
+
+// Chaque utilisateur ne voit et ne modifie que sa propre liste : users/{uid}/series/{seriesId}
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /users/{uid}/series/{seriesId} {
+      allow read, delete: if isOwner(uid);
+      allow create, update: if isOwner(uid) && isValidSeries(request.resource.data);
+    }
+
+    function isOwner(uid) {
+      return request.auth != null && request.auth.uid == uid;
+    }
+
+    function isValidSeries(d) {
+      return d.keys().hasAll(['site', 'seriesSlug', 'seriesTitle', 'seriesUrl', 'lastChapter', 'lastChapterUrl'])
+        && d.site is string && d.site.size() <= 200
+        && d.seriesSlug is string && d.seriesSlug.size() <= 300
+        && d.seriesTitle is string && d.seriesTitle.size() <= 300
+        && d.seriesUrl is string && d.seriesUrl.size() <= 2000
+        && d.lastChapterUrl is string && d.lastChapterUrl.size() <= 2000
+        && d.lastChapter is number && d.lastChapter >= 0;
+    }
+  }
+}
