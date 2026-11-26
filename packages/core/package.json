@@ -1,0 +1,13 @@
+{
+  "name": "@manga-tracker/core",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Détection du manga et du chapitre à partir d'une page de lecture.",
+  "type": "module",
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "scripts": {
+    "test": "vitest run",
+    "typecheck": "tsc -p ."
+  }
+}

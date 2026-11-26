@@ -1,0 +1,22 @@
+{
+  "name": "manga-tracker",
+  "private": true,
+  "description": "Suivi automatique des mangas lus en ligne, synchronisé entre PC et iPhone.",
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "scripts": {
+    "dev": "npm run dev -w @manga-tracker/web",
+    "build": "npm run build -w @manga-tracker/web",
+    "test": "npm run test -w @manga-tracker/core",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "emulators": "firebase emulators:start --project demo-manga-tracker",
+    "dev:local": "VITE_USE_EMULATORS=true npm run dev -w @manga-tracker/web"
+  },
+  "devDependencies": {
+    "firebase-tools": "^15.37.0",
+    "typescript": "^5.9.3",
+    "vitest": "^5.1.2"
+  }
+}
