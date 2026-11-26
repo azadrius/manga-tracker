@@ -15,7 +15,7 @@ Firebase stocke ta liste et gère la connexion Google. L'offre gratuite (« Spar
 6. **Récupérer la configuration** : roue dentée → *Paramètres du projet* → section *Vos applications*
    → icône `</>` (Web), nom `manga-tracker`, **sans** cocher Firebase Hosting.
    Copie les valeurs `apiKey`, `authDomain`, `projectId` et `appId` dans
-   [`apps/web/src/config.ts`](../apps/web/src/config.ts).
+   [`packages/core/src/firebaseProject.ts`](../packages/core/src/firebaseProject.ts).
 
 Ces valeurs ne sont pas secrètes : elles identifient le projet, et ce sont les règles Firestore
 qui empêchent quiconque d'autre de lire ou modifier ta liste.

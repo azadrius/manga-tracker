@@ -1,6 +1,10 @@
 rules_version = '2';
 
-// Chaque utilisateur ne voit et ne modifie que sa propre liste : users/{uid}/series/{seriesId}
+// users/{uid}/series/{id}     : la liste. Seul son propriétaire (connecté avec Google) y accède.
+// users/{uid}/inbox/{id}      : captures envoyées par l'extension Chrome / le script Safari avec une
+//                               « clé de capture ». Elles ne peuvent qu'y déposer des captures ;
+//                               l'appli web les range dans la liste puis les supprime.
+// users/{uid}/private/capture : la clé de capture en cours (générée depuis l'appli web).
 service cloud.firestore {
   match /databases/{database}/documents {
     match /users/{uid}/series/{seriesId} {
@@ -8,18 +12,48 @@ service cloud.firestore {
       allow create, update: if isOwner(uid) && isValidSeries(request.resource.data);
     }
 
+    match /users/{uid}/inbox/{captureId} {
+      allow read, delete: if isOwner(uid);
+      allow create: if hasCaptureKey(uid, request.resource.data) && isValidCapture(request.resource.data);
+    }
+
+    match /users/{uid}/private/{docId} {
+      allow read, write: if isOwner(uid);
+    }
+
     function isOwner(uid) {
       return request.auth != null && request.auth.uid == uid;
     }
 
+    function hasCaptureKey(uid, d) {
+      return d.captureKey is string
+        && d.captureKey.size() >= 32
+        && d.captureKey == get(/databases/$(database)/documents/users/$(uid)/private/capture).data.key;
+    }
+
+    function isShortString(v, max) {
+      return v is string && v.size() > 0 && v.size() <= max;
+    }
+
     function isValidSeries(d) {
       return d.keys().hasAll(['site', 'seriesSlug', 'seriesTitle', 'seriesUrl', 'lastChapter', 'lastChapterUrl'])
-        && d.site is string && d.site.size() <= 200
-        && d.seriesSlug is string && d.seriesSlug.size() <= 300
-        && d.seriesTitle is string && d.seriesTitle.size() <= 300
-        && d.seriesUrl is string && d.seriesUrl.size() <= 2000
-        && d.lastChapterUrl is string && d.lastChapterUrl.size() <= 2000
+        && isShortString(d.site, 200)
+        && isShortString(d.seriesSlug, 300)
+        && isShortString(d.seriesTitle, 300)
+        && isShortString(d.seriesUrl, 2000)
+        && isShortString(d.lastChapterUrl, 2000)
         && d.lastChapter is number && d.lastChapter >= 0;
+    }
+
+    function isValidCapture(d) {
+      return d.keys().hasOnly(['site', 'seriesSlug', 'seriesTitle', 'seriesUrl', 'chapter', 'chapterUrl', 'capturedAt', 'captureKey'])
+        && isShortString(d.site, 200)
+        && isShortString(d.seriesSlug, 300)
+        && isShortString(d.seriesTitle, 300)
+        && isShortString(d.seriesUrl, 2000)
+        && isShortString(d.chapterUrl, 2000)
+        && d.chapter is number && d.chapter >= 0 && d.chapter < 100000
+        && d.capturedAt is timestamp;
     }
   }
 }

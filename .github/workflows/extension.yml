@@ -1,0 +1,35 @@
+name: Extension Chrome
+
+# À chaque modification sur main, publie l'extension prête à installer
+# dans la release « extension » : https://github.com/<dépôt>/releases/tag/extension
+on:
+  push:
+    branches: [main]
+    paths: ["apps/extension/**", "packages/core/**", ".github/workflows/extension.yml"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm test
+      - run: npm run build:extension
+      - run: cd apps/extension/dist && zip -r ../../../manga-tracker-extension.zip .
+      - uses: softprops/action-gh-release@v2
+        with:
+          tag_name: extension
+          name: Extension Chrome (dernière version)
+          body: |
+            Télécharge `manga-tracker-extension.zip`, dézippe-le, puis suis le guide :
+            https://github.com/${{ github.repository }}/blob/main/docs/enregistrement-automatique.md
+          files: manga-tracker-extension.zip
+          make_latest: true
