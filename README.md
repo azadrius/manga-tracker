@@ -8,7 +8,7 @@ La liste est synchronisée via ton compte Google.
 
 ```
  Chrome (PC)            Safari (iPhone / iPad)
- extension              script « Userscripts » (étape 3)
+ extension              script « Userscripts »
       │   clé de capture       │
       └──────────┬─────────────┘
                  ▼
@@ -33,6 +33,7 @@ La liste est synchronisée via ton compte Google.
 | `packages/core` | Détection du manga et du chapitre, avec tests |
 | `apps/web` | Appli web (PWA) |
 | `apps/extension` | Extension Chrome |
+| `apps/userscript` | Script Safari pour l'app Userscripts (iPhone / iPad) |
 | `firestore.rules` | Règles de sécurité : chacun n'accède qu'à sa liste |
 | `docs/` | Guides de mise en place |
 | `.github/workflows` | Tests automatiques et déploiement sur GitHub Pages |
@@ -48,6 +49,7 @@ npm run dev:local    # appli connectée à la base locale, sans compte réel
 npm run dev          # appli connectée au vrai projet Firebase
 npm run build:extension        # extension dans apps/extension/dist
 npm run build:extension:local  # extension connectée aux émulateurs
+npm run build:userscript       # script Safari dans apps/userscript/dist
 ```
 
 Mise en place du projet Firebase : voir [docs/firebase-setup.md](docs/firebase-setup.md).

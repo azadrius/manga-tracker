@@ -14,7 +14,8 @@
     "emulators": "firebase emulators:start --project demo-manga-tracker",
     "dev:local": "VITE_USE_EMULATORS=true npm run dev -w @manga-tracker/web",
     "build:extension": "npm run build -w @manga-tracker/extension",
-    "build:extension:local": "EMULATORS=true npm run build -w @manga-tracker/extension"
+    "build:extension:local": "EMULATORS=true npm run build -w @manga-tracker/extension",
+    "build:userscript": "npm run build -w @manga-tracker/userscript"
   },
   "devDependencies": {
     "firebase-tools": "^15.37.0",

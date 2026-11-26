@@ -25,7 +25,7 @@ export function CaptureSettings({ uid }: { uid: string }) {
     <details className="settings">
       <summary>Enregistrement automatique</summary>
       <p className="muted">
-        L'extension Chrome et le script Safari utilisent cette clé pour ajouter les chapitres que tu lis.{" "}
+        L'extension Chrome et le script Safari utilisent cette clé pour ajouter les chapitres que tu lis. Sur iPhone et iPad, il suffit d'ouvrir cette page une fois avec le script installé.{" "}
         <a href={GUIDE_URL} target="_blank" rel="noreferrer">
           Guide d'installation
         </a>
@@ -39,7 +39,13 @@ export function CaptureSettings({ uid }: { uid: string }) {
       {key && (
         <>
           <div className="key-row">
-            <input readOnly value={key} onFocus={(e) => e.currentTarget.select()} aria-label="Clé de capture" />
+            <input
+              readOnly
+              value={key}
+              data-capture-key={key /* lu par le script Safari pour se relier tout seul */}
+              onFocus={(e) => e.currentTarget.select()}
+              aria-label="Clé de capture"
+            />
             <button onClick={copy}>{copied ? "Copiée ✓" : "Copier"}</button>
           </div>
           {confirming ? (
