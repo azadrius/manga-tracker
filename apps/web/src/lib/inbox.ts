@@ -7,9 +7,11 @@ import { recordChapter } from "./library";
  * Range dans la liste les chapitres déposés par l'extension / le script Safari,
  * puis vide la boîte. Tourne tant que l'appli est ouverte, sur n'importe quel appareil.
  */
+// Partagé entre les réabonnements : évite de traiter deux fois le même chapitre.
+const inFlight = new Set<string>();
+
 export function processInbox(uid: string, onError: (e: Error) => void) {
   const inbox = collection(db, "users", uid, "inbox");
-  const inFlight = new Set<string>();
   return onSnapshot(
     inbox,
     (snap) => {
