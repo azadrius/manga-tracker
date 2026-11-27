@@ -108,7 +108,7 @@ function withTimeout<T>(p: Promise<T>, ms: number): Promise<T> {
 /** Diagnostic : ajoute « #mt-debug » à la fin d'une adresse pour voir ce que le script détecte. */
 async function debugReport() {
   // 1) Message immédiat : prouve que le script s'exécute, avant tout accès au stockage.
-  toast("Manga Tracker v0.1.2 : script exécuté ✓", { duration: 8000 });
+  toast("Manga Tracker v0.1.3 : script exécuté ✓", { duration: 8000 });
   const capture = detectChapter({ url: location.href, title: document.title });
   let keyText: string;
   try {
