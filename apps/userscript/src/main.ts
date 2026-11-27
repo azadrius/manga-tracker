@@ -100,13 +100,30 @@ function watchChapters() {
   setInterval(() => void check(), 1500);
 }
 
+/** Attend une promesse, mais abandonne après `ms` (le stockage du gestionnaire de scripts peut ne jamais répondre). */
+function withTimeout<T>(p: Promise<T>, ms: number): Promise<T> {
+  return Promise.race([p, new Promise<T>((_, reject) => setTimeout(() => reject(new Error("timeout")), ms))]);
+}
+
 /** Diagnostic : ajoute « #mt-debug » à la fin d'une adresse pour voir ce que le script détecte. */
 async function debugReport() {
+  // 1) Message immédiat : prouve que le script s'exécute, avant tout accès au stockage.
+  toast("Manga Tracker v0.1.2 : script exécuté ✓", { duration: 8000 });
   const capture = detectChapter({ url: location.href, title: document.title });
-  const key = parseCaptureKey(await getValue<string>(KEY, ""));
-  toast(
-    `Manga Tracker actif · clé : ${key ? "oui" : "non"} · chapitre : ${capture ? `${capture.seriesTitle} ${capture.chapter}` : "non détecté"}`,
-    { duration: 8000 },
+  let keyText: string;
+  try {
+    const key = parseCaptureKey(await withTimeout(getValue<string>(KEY, ""), 3000));
+    keyText = key ? "oui" : "non";
+  } catch (e) {
+    keyText = `erreur de stockage (${e instanceof Error ? e.message : String(e)})`;
+  }
+  // 2) Détails, une fois le stockage lu.
+  setTimeout(
+    () =>
+      toast(`clé : ${keyText} · chapitre : ${capture ? `${capture.seriesTitle} ${capture.chapter}` : "non détecté"}`, {
+        duration: 10000,
+      }),
+    0,
   );
 }
 if (location.hash.includes("mt-debug")) void debugReport();
