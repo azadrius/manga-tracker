@@ -1,6 +1,6 @@
 {
   "name": "@manga-tracker/userscript",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "private": true,
   "description": "Script Safari (app « Userscripts ») : enregistre automatiquement le chapitre lu sur iPhone et iPad.",
   "type": "module",

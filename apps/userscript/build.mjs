@@ -33,5 +33,17 @@ const result = await build({
 });
 
 await mkdir("dist", { recursive: true });
-await writeFile("dist/manga-tracker.user.js", header + result.outputFiles[0].text);
+// Sonde de diagnostic, avant le code de l'appli : avec « #mt-debug » dans l'adresse, une alerte prouve que
+// Userscripts exécute bien le fichier, et une 2e alerte montre toute erreur du code principal.
+const probe = `var __mtDebug = location.hash.indexOf("mt-debug") !== -1;
+if (__mtDebug) alert("Manga Tracker v${pkg.version} : le fichier est exécuté ✓ (GM : " + (typeof GM) + ")");
+try {
+`;
+const probeEnd = `
+} catch (e) {
+  if (__mtDebug) alert("Manga Tracker : erreur au démarrage : " + (e && e.message ? e.message : e));
+  else console.error("Manga Tracker", e);
+}
+`;
+await writeFile("dist/manga-tracker.user.js", header + probe + result.outputFiles[0].text + probeEnd);
 console.log("dist/manga-tracker.user.js");
