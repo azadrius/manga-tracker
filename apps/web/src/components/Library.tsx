@@ -19,25 +19,27 @@ const sorters: Record<Sort, (a: Series, b: Series) => number> = {
 const normalize = (s: string) => s.normalize("NFD").replace(/\p{Diacritic}/gu, "").toLowerCase();
 
 /**
- * Sur iPhone, Safari coupe les connexions temps réel quand la page passe en arrière-plan
- * et ne les rétablit pas toujours. On change de valeur à chaque retour au premier plan
- * (ou retour du réseau) pour forcer la réouverture des écoutes.
+ * Sur iPhone, Safari coupe les connexions quand la page passe en arrière-plan.
+ * On ne change de valeur qu'au retour après une vraie absence (>5 s), une seule fois
+ * (pas à chaque événement focus/pageshow), pour relancer l'écoute de la boîte de réception.
  */
 function useForegroundTick() {
   const [tick, setTick] = useState(0);
   useEffect(() => {
-    const bump = () => {
-      if (document.visibilityState === "visible") setTick((t) => t + 1);
+    let hiddenAt = 0;
+    const onChange = () => {
+      if (document.visibilityState === "hidden") hiddenAt = Date.now();
+      else if (hiddenAt && Date.now() - hiddenAt > 5000) {
+        hiddenAt = 0;
+        setTick((t) => t + 1);
+      }
     };
-    document.addEventListener("visibilitychange", bump);
-    window.addEventListener("pageshow", bump);
-    window.addEventListener("focus", bump);
-    window.addEventListener("online", bump);
+    const onOnline = () => setTick((t) => t + 1);
+    document.addEventListener("visibilitychange", onChange);
+    window.addEventListener("online", onOnline);
     return () => {
-      document.removeEventListener("visibilitychange", bump);
-      window.removeEventListener("pageshow", bump);
-      window.removeEventListener("focus", bump);
-      window.removeEventListener("online", bump);
+      document.removeEventListener("visibilitychange", onChange);
+      window.removeEventListener("online", onOnline);
     };
   }, []);
   return tick;
@@ -45,13 +47,16 @@ function useForegroundTick() {
 
 export function Library({ user }: { user: User }) {
   const tick = useForegroundTick();
-  const { series, error } = useLibrary(user.uid, tick);
+  const { series, error } = useLibrary(user.uid);
   const [search, setSearch] = useState("");
   const [sort, setSort] = useState<Sort>("recent");
   const [inboxError, setInboxError] = useState<Error | null>(null);
 
   // Range les chapitres envoyés par l'extension / le script Safari.
-  useEffect(() => processInbox(user.uid, setInboxError), [user.uid, tick]);
+  useEffect(() => {
+    setInboxError(null);
+    return processInbox(user.uid, setInboxError);
+  }, [user.uid, tick]);
 
   const visible = useMemo(() => {
     const q = normalize(search.trim());
